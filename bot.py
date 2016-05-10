@@ -8,7 +8,9 @@ bot = telebot.TeleBot(config.token)
 games_map = {}
 
 mrk_create_game = types.ReplyKeyboardMarkup()
-mrk_create_game.row('/game')
+em = u'\U0001f604'
+mrk_create_game.row('Начать новую игру')
+# mrk_create_game.row('Об игре ' + em)
 
 mrk_hide = types.ReplyKeyboardHide()
 
@@ -17,7 +19,7 @@ def make_mrk(q):
     mrk = types.ReplyKeyboardMarkup()
     for k in q.vargs:
         mrk.row(k)
-    mrk.row('/end')
+    mrk.row('Завершить игру')
     return mrk
 
 
@@ -31,7 +33,7 @@ def usr_null(chatid):
                      reply_markup=mrk_create_game)
 
 
-@bot.message_handler(commands=['start', 'game', 'end'])
+@bot.message_handler(commands=['start'])
 def echo_commands(cmd):
     user = cmd.chat.username
     chatid = cmd.chat.id
@@ -41,18 +43,6 @@ def echo_commands(cmd):
     if cmd.text == '/start':
         bot.send_message(cmd.chat.id, 'Ассаламалейкум, ' + user + '. Давай проверим твои знания !',
                          reply_markup=mrk_create_game)
-    # Начать новую игру
-    elif cmd.text == '/game':
-        if check_game(user):
-            bot.send_message(cmd.chat.id, 'Вы уже играете !')
-        else:
-            bot.send_message(cmd.chat.id, 'Игра началась.')
-            g = setup_game(user, chatid)
-            _next(g)
-
-    elif cmd.text == '/end':
-        games_map[user] = None
-        bot.send_message(cmd.chat.id, 'Вы завершили игру', reply_markup=types.ReplyKeyboardHide())
 
 
 def _next(g):
@@ -75,21 +65,44 @@ def _next(g):
 def handler_game_answers(ans):
     user = ans.chat.username
     chatid = ans.chat.id
+
+    # если у юзера не установлен Имя пользователя (ник)
     if user is None:
         usr_null(chatid)
         return
-    game = None
+
+    # Начать новую игру
+    if ans.text == 'Начать новую игру':
+        if check_game(user):
+            bot.send_message(chatid, 'Вы уже играете !')
+            return
+        else:
+            bot.send_message(chatid, 'Игра началась.')
+            g = setup_game(user, chatid)
+            _next(g)
+            return
+
+    elif ans.text == 'Завершить игру':
+        games_map[user] = None
+        bot.send_message(chatid, 'Вы завершили игру', reply_markup=types.ReplyKeyboardHide())
+
+    # проверка существования игры
     if check_game(user):
         game = games_map[user]
-        print('your ans is ' + ans.text)
+        print(user + ' ответил - ' + ans.text)
+
+        # сравнение варианта с правильным ответом
         if game.cq.is_right(ans.text):
             bot.send_message(chatid, 'Правильно ! Ответ - ' + game.cq.right + '\n\n')
             game.score += 1
-            print('your ans is correct')
+            print(user + ' ответил правильно ')
             _next(game)
             return
+
         else:
             for v in game.cq.vargs:
+
+                # если ответ юзера существует среди вариантов, юзер проиграл
                 if v == ans.text:
                     games_map[user] = None
                     bot.send_message(chatid,
@@ -100,8 +113,9 @@ def handler_game_answers(ans):
                                      + ' балл(а, ов)',
                                      reply_markup=mrk_create_game)
                     return
-
-            bot.send_message(chatid, 'Пожалуйста, выберите один из предложенных вариантов, либо завершите текущую игру, отправив команду /end')
+            # иначе, если ответ юзера не существует среди вариантов, продолжаем принимать ответы
+            bot.send_message(chatid,
+                             'Пожалуйста, выберите один из предложенных вариантов, либо завершите текущую игру, нажав на кнопку \"Завершить игру\"')
             return
 
     else:
