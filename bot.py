@@ -2,8 +2,11 @@ import telebot
 import config
 from telebot import types
 from gamesingle import GameSingle
+import time
 
-bot = telebot.TeleBot(config.token)
+print(time.strftime("%d " + 'chislo' + "%H:%M"))
+
+bot = telebot.TeleBot(config.token_game)
 
 games_map = {}
 
@@ -78,25 +81,38 @@ def handler_game_answers(ans):
             return
         else:
             bot.send_message(chatid, 'Игра началась.')
+
+            with open(user, 'a') as f:
+                f.write(time.strftime('\n' + "%d" + ' chislo, time = ' + "%H:%M" + '\n'))
+                f.write(user + ' начал(а) играть' + '\n')
             g = setup_game(user, chatid)
             _next(g)
             return
 
     elif ans.text == 'Завершить игру':
+        with open(user, 'a') as f:
+            f.write(time.strftime("%d" + ' chislo, time = ' + "%H:%M" + '\n'))
+            f.write(user + 'завершил игру')
         games_map[user] = None
         bot.send_message(chatid, 'Вы завершили игру', reply_markup=types.ReplyKeyboardHide())
-
+        return
     # проверка существования игры
     if check_game(user):
         game = games_map[user]
+
+        with open(user, 'a') as f:
+            f.write('На вопрос ' + game.cq.q + '\n')
+            f.write(user + ' ответил ' + ans.text)
         print(user + ' ответил - ' + ans.text)
 
         # сравнение варианта с правильным ответом
         if game.cq.is_right(ans.text):
             bot.send_message(chatid, 'Правильно ! Ответ - ' + game.cq.right + '\n\n')
             game.score += 1
-            print(user + ' ответил правильно ')
             _next(game)
+            with open(user, 'a') as f:
+                f.write(' и ответил правильно ' + '\n')
+            print(user + ' ответил правильно ')
             return
 
         else:
@@ -112,6 +128,8 @@ def handler_game_answers(ans):
                                      + str(game.score)
                                      + ' балл(а, ов)',
                                      reply_markup=mrk_create_game)
+                    with open(user, 'a') as f:
+                        f.write(' и ответил неправильно ' + '\n')
                     return
             # иначе, если ответ юзера не существует среди вариантов, продолжаем принимать ответы
             bot.send_message(chatid,
@@ -119,6 +137,8 @@ def handler_game_answers(ans):
             return
 
     else:
+        with open(user, 'a') as f:
+            f.write(user + ' написал ' + ans.text + '\n')
         bot.send_message(chatid, 'Вы еще не играете? Создайте игру, Вам понравится !',
                          reply_markup=mrk_create_game)
         return
