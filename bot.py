@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import telebot
 import config
 from telebot import types
