@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from q import Q
 from utils import get_questions
 

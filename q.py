@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class Q:
     def __init__(self, q, vargs):
         self.q = q

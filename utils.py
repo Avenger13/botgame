@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import qstns
 from random import Random
 
