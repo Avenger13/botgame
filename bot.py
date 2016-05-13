@@ -12,9 +12,7 @@ bot = telebot.TeleBot(config.token_game)
 games_map = {}
 
 mrk_create_game = types.ReplyKeyboardMarkup()
-em = u'\U0001f604'
 mrk_create_game.row('Start New Game')
-# mrk_create_game.row('Об игре ' + em)
 
 mrk_hide = types.ReplyKeyboardHide()
 
@@ -105,7 +103,7 @@ def handler_game_answers(ans):
             for v in game.cq.vargs:
 
                 # если ответ юзера существует среди вариантов, юзер проиграл
-                if v == ans.text:
+                if v.encode('utf-8') == ans.text.encode('utf-8'):
                     games_map[user] = None
                     bot.send_message(chatid,
                                      'К сожалению, Вы ответили неверно. Правильный ответ - '
