@@ -13,7 +13,7 @@ games_map = {}
 
 mrk_create_game = types.ReplyKeyboardMarkup()
 em = u'\U0001f604'
-mrk_create_game.row('Начать новую игру')
+mrk_create_game.row('Start New Game')
 # mrk_create_game.row('Об игре ' + em)
 
 mrk_hide = types.ReplyKeyboardHide()
@@ -23,7 +23,7 @@ def make_mrk(q):
     mrk = types.ReplyKeyboardMarkup()
     for k in q.vargs:
         mrk.row(k)
-    mrk.row('Завершить игру')
+    mrk.row('End Game')
     return mrk
 
 
@@ -75,25 +75,18 @@ def handler_game_answers(ans):
         usr_null(chatid)
         return
 
-    # Начать новую игру
-    if ans.text == 'Начать новую игру'.encode('utf-8'):
+    # Start New Game
+    if ans.text == 'Start New Game':
         if check_game(user):
             bot.send_message(chatid, 'Вы уже играете !')
             return
         else:
             bot.send_message(chatid, 'Игра началась.')
-
-            with open('game_log.txt', 'a') as f:
-                f.write(time.strftime('\n' + "%d" + ' chislo, time = ' + "%H:%M" + '\n'))
-                f.write(user + ' начал(а) играть'.encode('utf-8') + '\n')
             g = setup_game(user, chatid)
             _next(g)
             return
 
-    elif ans.text == 'Завершить игру'.encode('utf-8'):
-        with open('game_log.txt', 'a') as f:
-            f.write(time.strftime("%d" + ' chislo, time = ' + "%H:%M" + '\n'))
-            f.write(user + 'завершил игру'.encode('utf-8'))
+    elif ans.text == 'End Game'.encode('utf-8'):
         games_map[user] = None
         bot.send_message(chatid, 'Вы завершили игру', reply_markup=types.ReplyKeyboardHide())
         return
@@ -101,17 +94,11 @@ def handler_game_answers(ans):
     if check_game(user):
         game = games_map[user]
 
-        with open('game_log.txt', 'a') as f:
-            f.write('На вопрос '.encode('utf-8') + game.cq.q.encode('utf-8') + '\n')
-            f.write(user + ' ответил '.encode('utf-8') + ans.text.encode('utf-8'))
-
         # сравнение варианта с правильным ответом
         if game.cq.is_right(ans.text):
             bot.send_message(chatid, 'Правильно ! Ответ - ' + game.cq.right + '\n\n')
             game.score += 1
             _next(game)
-            with open('game_log.txt', 'a') as f:
-                f.write(' и ответил правильно '.encode('utf-8') + '\n\n')
             return
 
         else:
@@ -127,18 +114,15 @@ def handler_game_answers(ans):
                                      + str(game.score)
                                      + ' балл(а, ов)',
                                      reply_markup=mrk_create_game)
-                    with open('game_log.txt', 'a') as f:
-                        f.write(' и ответил неправильно, правильный ответ - '.encode('utf-8') + game.cq.right.encode('utf-8') + '\n')
-                        f.write(time.strftime("%d" + ' chislo, time = ' + "%H:%M" + '\n'))
+                    
                     return
             # иначе, если ответ юзера не существует среди вариантов, продолжаем принимать ответы
             bot.send_message(chatid,
-                             'Пожалуйста, выберите один из предложенных вариантов, либо завершите текущую игру, нажав на кнопку \"Завершить игру\"')
+                             'Пожалуйста, выберите один из предложенных вариантов, либо завершите текущую игру, нажав на кнопку \"End Game\"')
             return
 
     else:
-        with open('game_log.txt', 'a') as f:
-            f.write(user + ' написал '.encode('utf-8') + ans.text.encode('utf-8') + '\n')
+        
         bot.send_message(chatid, 'Вы еще не играете? Создайте игру, Вам понравится !',
                          reply_markup=mrk_create_game)
         return
