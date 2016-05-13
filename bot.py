@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import telebot
 import config
 from telebot import types
@@ -84,7 +83,7 @@ def handler_game_answers(ans):
             _next(g)
             return
 
-    elif ans.text == 'End Game'.encode('utf-8'):
+    elif ans.text == 'End Game':
         games_map[user] = None
         bot.send_message(chatid, 'Вы завершили игру', reply_markup=types.ReplyKeyboardHide())
         return
@@ -112,7 +111,7 @@ def handler_game_answers(ans):
                                      + str(game.score)
                                      + ' балл(а, ов)',
                                      reply_markup=mrk_create_game)
-                    
+
                     return
             # иначе, если ответ юзера не существует среди вариантов, продолжаем принимать ответы
             bot.send_message(chatid,
@@ -120,7 +119,7 @@ def handler_game_answers(ans):
             return
 
     else:
-        
+
         bot.send_message(chatid, 'Вы еще не играете? Создайте игру, Вам понравится !',
                          reply_markup=mrk_create_game)
         return

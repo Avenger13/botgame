@@ -14,4 +14,4 @@ class Q:
         #         return self.vargs[e]
         #
         # print('choose one of the listed variants')
-        return e.encode('utf-8') == self.right.encode('utf-8')
+        return e.encode('cp1251') == self.right.encode('cp1251')
