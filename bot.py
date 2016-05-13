@@ -83,17 +83,17 @@ def handler_game_answers(ans):
         else:
             bot.send_message(chatid, 'Игра началась.')
 
-            with open('game_log.txt', 'a', encoding='utf-8') as f:
+            with open('game_log.txt', 'a') as f:
                 f.write(time.strftime('\n' + "%d" + ' chislo, time = ' + "%H:%M" + '\n'))
-                f.write(user + ' начал(а) играть' + '\n')
+                f.write(user + ' начал(а) играть'.encode('utf-8') + '\n')
             g = setup_game(user, chatid)
             _next(g)
             return
 
     elif ans.text == 'Завершить игру':
-        with open('game_log.txt', 'a', encoding='utf-8') as f:
+        with open('game_log.txt', 'a') as f:
             f.write(time.strftime("%d" + ' chislo, time = ' + "%H:%M" + '\n'))
-            f.write(user + 'завершил игру')
+            f.write(user + 'завершил игру'.encode('utf-8'))
         games_map[user] = None
         bot.send_message(chatid, 'Вы завершили игру', reply_markup=types.ReplyKeyboardHide())
         return
@@ -101,19 +101,17 @@ def handler_game_answers(ans):
     if check_game(user):
         game = games_map[user]
 
-        with open('game_log.txt', 'a', encoding='utf-8') as f:
-            f.write('На вопрос ' + game.cq.q + '\n')
-            f.write(user + ' ответил ' + ans.text)
-        print(user + ' ответил - ' + ans.text)
+        with open('game_log.txt', 'a') as f:
+            f.write('На вопрос '.encode('utf-8') + game.cq.q.encode('utf-8') + '\n')
+            f.write(user + ' ответил '.encode('utf-8') + ans.text.encode('utf-8'))
 
         # сравнение варианта с правильным ответом
         if game.cq.is_right(ans.text):
             bot.send_message(chatid, 'Правильно ! Ответ - ' + game.cq.right + '\n\n')
             game.score += 1
             _next(game)
-            with open('game_log.txt', 'a', encoding='utf-8') as f:
-                f.write(' и ответил правильно ' + '\n\n')
-            print(user + ' ответил правильно ')
+            with open('game_log.txt', 'a') as f:
+                f.write(' и ответил правильно '.encode('utf-8') + '\n\n')
             return
 
         else:
@@ -129,8 +127,8 @@ def handler_game_answers(ans):
                                      + str(game.score)
                                      + ' балл(а, ов)',
                                      reply_markup=mrk_create_game)
-                    with open('game_log.txt', 'a', encoding='utf-8') as f:
-                        f.write(' и ответил неправильно, правильный ответ - ' + game.cq.right + '\n')
+                    with open('game_log.txt', 'a') as f:
+                        f.write(' и ответил неправильно, правильный ответ - '.encode('utf-8') + game.cq.right.encode('utf-8') + '\n')
                         f.write(time.strftime("%d" + ' chislo, time = ' + "%H:%M" + '\n'))
                     return
             # иначе, если ответ юзера не существует среди вариантов, продолжаем принимать ответы
@@ -139,8 +137,8 @@ def handler_game_answers(ans):
             return
 
     else:
-        with open('game_log.txt', 'a', encoding='utf-8') as f:
-            f.write(user + ' написал ' + ans.text + '\n')
+        with open('game_log.txt', 'a') as f:
+            f.write(user + ' написал '.encode('utf-8') + ans.text.encode('utf-8') + '\n')
         bot.send_message(chatid, 'Вы еще не играете? Создайте игру, Вам понравится !',
                          reply_markup=mrk_create_game)
         return
