@@ -76,7 +76,7 @@ def handler_game_answers(ans):
         return
 
     # Начать новую игру
-    if ans.text == 'Начать новую игру':
+    if ans.text == 'Начать новую игру'.encode('utf-8'):
         if check_game(user):
             bot.send_message(chatid, 'Вы уже играете !')
             return
@@ -90,7 +90,7 @@ def handler_game_answers(ans):
             _next(g)
             return
 
-    elif ans.text == 'Завершить игру':
+    elif ans.text == 'Завершить игру'.encode('utf-8'):
         with open('game_log.txt', 'a') as f:
             f.write(time.strftime("%d" + ' chislo, time = ' + "%H:%M" + '\n'))
             f.write(user + 'завершил игру'.encode('utf-8'))
