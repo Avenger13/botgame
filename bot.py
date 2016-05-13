@@ -103,7 +103,7 @@ def handler_game_answers(ans):
             for v in game.cq.vargs:
 
                 # если ответ юзера существует среди вариантов, юзер проиграл
-                if v.encode('utf-8') == ans.text.encode('utf-8'):
+                if v.encode('cp1251') == ans.text.encode('cp1251'):
                     games_map[user] = None
                     bot.send_message(chatid,
                                      'К сожалению, Вы ответили неверно. Правильный ответ - '
