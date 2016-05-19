@@ -14,4 +14,8 @@ class Q:
         #         return self.vargs[e]
         #
         # print('choose one of the listed variants')
-        return e.decode('utf-8') == self.right.decode('utf-8')
+        print('e = ' + e)
+        print(type(e))
+        print('right = ' + self.right)
+        print(type(self.right))
+        return e == self.right

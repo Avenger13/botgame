@@ -93,7 +93,7 @@ def handler_game_answers(ans):
         game = games_map[user]
 
         # сравнение варианта с правильным ответом
-        if game.cq.is_right(ans.text):
+        if game.cq.is_right(ans.text.encode('utf-8')):
             bot.send_message(chatid, 'Правильно ! Ответ - ' + game.cq.right + '\n\n')
             game.score += 1
             _next(game)
@@ -103,7 +103,7 @@ def handler_game_answers(ans):
             for v in game.cq.vargs:
 
                 # если ответ юзера существует среди вариантов, юзер проиграл
-                if v.decode('utf-8') == ans.text.decode('utf-8'):
+                if v == ans.text.encode('utf-8'):
                     games_map[user] = None
                     bot.send_message(chatid,
                                      'К сожалению, Вы ответили неверно. Правильный ответ - '
